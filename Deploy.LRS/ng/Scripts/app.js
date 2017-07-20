@@ -296,7 +296,7 @@ var constants = constantsObj();
                             },
                             function (result) {
                                 telemetry.logDeployFailed('postdeployment');
-                                if (result.data != null && result.data.error != null) {
+                                if (result.data !== null && result.data.error !== null) {
                                     $scope.formData.errorMesg = result.data.error;
                                     $window.location.href = $scope.formData.portalUrl;
                                 }
@@ -344,7 +344,7 @@ var constants = constantsObj();
 
                             $scope.formData.errorMesg = result.data.error;
                             if (result.data) {
-                                if (result.status == 406)
+                                if (result.status === 406)
                                 {
                                     $window.location.href = result.data;
                                 }

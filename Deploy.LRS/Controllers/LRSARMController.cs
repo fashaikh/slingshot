@@ -224,7 +224,7 @@ namespace Deploy.Controllers
                 await Task.Delay(TimeSpan.FromSeconds(Math.Exp(attempt % 3)));
                 var application = HttpContext.Current.ApplicationInstance as HttpApplication;
                 ARMOAuthModule.RemoveSessionCookie(application);
-                var loginUrl = ARMOAuthModule.GetTryReLoginUrl(application, templateName,attempt);
+                var loginUrl = ARMOAuthModule.GetTryReLoginUrl(application, templateName, attempt);
                 response = Request.CreateResponse(HttpStatusCode.NotAcceptable, loginUrl);
                 return response;
             }

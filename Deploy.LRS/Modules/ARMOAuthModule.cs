@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Globalization;
 using System.IdentityModel.Selectors;
 using System.IdentityModel.Tokens;
@@ -168,7 +169,7 @@ namespace Deploy.Modules
             var response_type = "id_token code";
             var issuerAddress = config.GetAuthorizationEndpoint(tenantId);
             //var redirect_uri = request.Url.GetLeftPart(UriPartial.Authority);
-            var redirect_uri = request.UrlReferrer ?? new Uri($"https://deploy.azure.com/try/?templateName={templateName}&attempt={attempt}");
+            var redirect_uri = "https://deploy.azure.com/";
             var client_id = AADClientId;
             var nonce = GenerateNonce();
             var response_mode = "form_post";
@@ -184,7 +185,28 @@ namespace Deploy.Modules
             strb.AppendFormat("&site_id={0}", WebUtility.UrlEncode(site_id));
             strb.AppendFormat("&response_mode={0}", WebUtility.UrlEncode(response_mode));
             //strb.AppendFormat("&state={0}", WebUtility.UrlEncode(state ?? request.Url.PathAndQuery));
-            strb.AppendFormat("&state={0}", WebUtility.UrlEncode(state ?? request.Url.Query));
+            var query = request.Url.Query;
+            var additionalData = String.Empty;
+            if (!string.IsNullOrEmpty(query))
+            {
+                NameValueCollection qscoll = HttpUtility.ParseQueryString(query);
+                var correlationId = qscoll["correlationId"];
+                var culture = qscoll["culture"];
+                var subscriptionId = qscoll["subscriptionId"];
+                if (!string.IsNullOrEmpty(correlationId))
+                {
+                    additionalData += $"&correlationId={correlationId}";
+                }
+                if (!string.IsNullOrEmpty(subscriptionId))
+                {
+                    additionalData += $"&subscriptionId={subscriptionId}";
+                }
+                if (!string.IsNullOrEmpty(culture))
+                {
+                    additionalData += $"&culture={culture}";
+                }
+            }
+            strb.AppendFormat("&state={0}", WebUtility.UrlEncode(state ?? $"/try/?templateName={templateName}&attempt={attempt}{additionalData}"));
 
             return strb.ToString();
         }
